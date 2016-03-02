@@ -1,0 +1,122 @@
+body{
+    font-family: "微软雅黑";
+    -webkit-user-select: none;
+}
+pre{
+    padding: 0;
+    background: none;
+    border: none;
+}
+header{
+    transition: all .3s;
+}
+.navbar-quit{
+    font-size: 40px;
+    cursor: default;
+}
+.application-quit-border{
+    transition: background-color .1s;
+}
+.application-quit-border:hover{
+    background-color: rgba(0, 0, 0, 0.12);
+}
+.mainsection-info-body{
+    max-height: 70vh;
+    overflow-y: auto;
+}
+.player-maininfo{
+    /*height: 179px;*/
+}
+.player-controls{
+    margin-left: 20px;
+}
+.player-controls>.p-title{
+    position: absolute;
+    width: calc(100% - 263px);
+    font-size: 24px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    font-family: "微软雅黑";
+    font-weight: 400 !important;
+    margin-top: 0;
+}
+.player-controls>.p-text{
+    position: absolute;
+    width: calc(100% - 263px);
+    top: 55px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    font-weight: 400 !important;
+}
+.player-requester{
+    position: absolute;
+    top: 174px;
+}
+.player-timespan{
+    position: absolute;
+    top: 174px;
+    right: 34px;
+}
+.player-lyrics{
+    width: calc(100% - 263px);
+    position: absolute;
+    text-align: center;
+    top: 120px;
+}
+.player-lyrics>p{
+    margin-bottom: 0;
+}
+.lyrics-main{
+    font-size: 16px;
+    min-height: 22px;
+    font-weight: 400 !important;
+}
+.progress{
+    margin-bottom: 0;
+}
+.player-list{
+    font-size: 12px;
+    margin-bottom: 0;
+}
+.player-list .playlist-index{
+    width: 64px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}
+.player-list .playlist-title{
+    width: 248px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}
+.player-list .playlist-artists{
+    width: 204px;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}
+.player-status{
+    position: fixed;
+    bottom: 10px;
+}
+/*滚动条*/
+::-webkit-scrollbar {  
+    width: 8px;
+    transition: all .2s;
+}
+::-webkit-scrollbar-thumb {  
+    border-radius: 10px;  
+    background: rgba(0,0,0,0.2);   
+}  
+::-webkit-scrollbar-thumb:window-inactive {  
+    background: rgba(0,0,0,0.1);   
+}  
+::-webkit-scrollbar-thumb:vertical:hover{  
+    background-color: rgba(0,0,0,0.3);  
+}
+::-webkit-scrollbar-thumb:vertical:active{  
+    background-color: rgba(0,0,0,0.7);  
+}

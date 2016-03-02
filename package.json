@@ -1,0 +1,15 @@
+{
+  "main": "index.html",
+  "name": "bili-danmu-vod",
+  "version": "0.1.0",
+  "window": {
+    "icon": "img/icon.png",
+    "toolbar": false,
+    "width": 960,
+    "height": 540,
+    "frame": false
+  },
+  "dependencies": {
+    "request": "^2.69.0"
+  }
+}
