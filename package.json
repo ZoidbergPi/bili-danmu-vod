@@ -1,7 +1,7 @@
 {
   "main": "index.html",
   "name": "bili-danmu-vod",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "window": {
     "icon": "img/icon.png",
     "toolbar": false,

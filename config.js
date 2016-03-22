@@ -38,5 +38,17 @@ var CONFIG = {
     freePlay: true,
     
     //空闲时播放的网易云歌单编号
-    freelistId: 144580007
+    freelistId: 144580007,
+    
+    //当前歌词输出文件路径（请保证文件存在并可写，如果歌词不存在则全程为空）
+    lyricFile: "lyric.txt",
+    
+    //翻译歌词输出文件路径（请保证文件存在并可写，如果翻译不存在则全程为空）
+    tlyricFile: "lyric.tanslated.txt",
+    
+    //当前播放歌曲名称输出文件路径（请保证文件存在并可写）
+    titleFile: "title.txt",
+    
+    //歌曲名称输出内容前缀
+    titlePrefix: "Now playing: "
 };

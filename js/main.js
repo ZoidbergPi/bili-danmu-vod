@@ -1,6 +1,6 @@
 "use strict"
 //Main.js
-var Version = "0.1.0";
+var Version = "0.1.1";
 
 //初始化全局变量
 var gui = require('nw.gui');

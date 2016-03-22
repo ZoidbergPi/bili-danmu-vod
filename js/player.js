@@ -14,10 +14,10 @@ class Song {
     }
     getDetailInfo() {
         var self = this;
-        return Promise.all([this.api.songDetail(this.songid), this.api.songLyric(this.songid)]).then(function (data) {
+        return Promise.all([this.api.songDetail(this.songid), this.api.songLyric(this.songid)]).then(function(data) {
             var detail = data[0];
             var lyric = data[1];
-            
+
             /* 歌曲信息处理部分 */
             var songInfo = JSON.parse(detail).songs[0];
             self.title = songInfo.name;
@@ -30,7 +30,7 @@ class Song {
             self.artists = artistArr.join("、");
             self.album = songInfo.album.name;
             self.cover = songInfo.album.picUrl;
-            
+
             /* 歌词处理部分 */
             var lyricObj = JSON.parse(lyric);
             if (lyricObj.lrc == undefined) {
@@ -45,9 +45,9 @@ class Song {
                     self.lyric = lyricObj.lrc.lyric;
                 }
                 //处理翻译歌词
-                if(lyricObj.tlyric == undefined){
+                if (lyricObj.tlyric == undefined) {
                     self.tlyric = null;
-                }else if (lyricObj.tlyric.lyric == null) {
+                } else if (lyricObj.tlyric.lyric == null) {
                     self.tlyric = null;
                 } else if (lyricObj.tlyric.lyric[0] != '[') {
                     //无可滚动歌词
@@ -71,6 +71,7 @@ class Player {
         nowinfo.status.status = "点歌方式：发送弹幕 点歌 歌曲名";
         this.nowinfo = nowinfo;
         this.voter = [];
+        this.sfi = new SyncFileInfo($("title")[0]);
         infobox.appendRed("初始化完成。");
         this.freePlaylist = [];
         this.freePlaylistIndex = 0;
@@ -86,7 +87,7 @@ class Player {
         }
 
         var self = this;
-        this.api.search(skey).then(function (result) {
+        this.api.search(skey).then(function(result) {
             var res = JSON.parse(result);
             if (res.result.songCount == 0) {
                 self.infobox.appendRed(rname + " 点歌失败：未找到。");
@@ -135,7 +136,7 @@ class Player {
             this.startPlay();
         } else {
             this.musicQueue.push(song);
-            song.info = song.info.then(function () {
+            song.info = song.info.then(function() {
                 self.nowinfo.list.push({
                     "title": song.title,
                     "artists": song.artists,
@@ -206,18 +207,20 @@ class Player {
         a.currentTime = 0;
         $(a).unbind();
         //开始加载
-        this.playing.info = this.playing.info.then(function () {
+        this.playing.info = this.playing.info.then(function() {
             a.src = self.playing.src;
             var lrcProvider = null;
             if (self.playing.lyric != null) {
-                lrcProvider = new LrcProvider(self.playing, self.nowinfo);
+                lrcProvider = new LrcProvider(self.playing, self.nowinfo, self.sfi);
             }
-            $(a).on("ended", function (event) {
+            $(a).on("ended", function(event) {
                 self.nowinfo.info.lyric = "";
+                self.sfi.lyric = "";
                 self.nowinfo.info.tlyric = "";
+                self.sfi.tlyric = "";
                 self.checkNext();
             });
-            $(a).on("timeupdate", function (event) {
+            $(a).on("timeupdate", function(event) {
                 var nowTime = a.currentTime * 1000;
                 self.nowinfo.info.percent = (nowTime / self.playing.duration) * 100 + "%";
                 self.nowinfo.info.nowtime = Player.formatTime(nowTime);
@@ -232,7 +235,9 @@ class Player {
     checkNext() {
         var a = this.audioElement;
         this.nowinfo.info.lyric = "";
+        this.sfi.lyric = "";
         this.nowinfo.info.tlyric = "";
+        this.sfi.tlyric = "";
         a.pause();
         if (this.musicQueue.length <= 0) {
             this.playing = null;
@@ -269,7 +274,7 @@ class Player {
                 this.infobox.appendRed("错误：空闲时播放歌单未配置。");
                 return;
             }
-            this.api.playlistDetail(CONFIG.freelistId).then(function (data) {
+            this.api.playlistDetail(CONFIG.freelistId).then(function(data) {
                 var res = JSON.parse(data);
                 if (res.code != 200) {
                     self.infobox.appendRed("错误：歌单未找到。");
@@ -305,6 +310,7 @@ class Player {
         this.nowinfo.info.cover = this.playing.cover;
         this.nowinfo.info.title = this.playing.title;
         this.nowinfo.info.artists = this.playing.artists;
+        this.sfi.title = this.playing.artists + " - " + this.playing.title;
         this.nowinfo.info.album = this.playing.album;
         this.nowinfo.info.reqer = this.playing.reqer;
         this.nowinfo.info.duration = Player.formatTime(this.playing.duration);
@@ -313,13 +319,16 @@ class Player {
         this.nowinfo.info.cover = "img/cover.jpg";
         this.nowinfo.info.title = "暂无音乐";
         this.nowinfo.info.artists = "";
+        this.sfi.title = "";
         this.nowinfo.info.album = "";
         this.nowinfo.info.reqer = "";
         this.nowinfo.info.nowtime = "00:00";
         this.nowinfo.info.duration = "00:00";
         this.nowinfo.info.percent = "0%";
         this.nowinfo.info.lyric = "";
+        this.sfi.lyric = "";
         this.nowinfo.info.tlyric = "";
+        this.sfi.tlyric = "";
     }
 }
 class LyricItem {
@@ -330,7 +339,7 @@ class LyricItem {
     }
 }
 class LrcProvider {
-    constructor(song, nowinfo) {
+    constructor(song, nowinfo, sfi) {
         this.lyric = LrcProvider.convertLrc(song.lyric);
         if (song.tlyric != null) {
             this.tlyric = LrcProvider.convertLrc(song.tlyric);
@@ -338,6 +347,7 @@ class LrcProvider {
             this.tlyric = null;
         }
         this.nowinfo = nowinfo;
+        this.sfi = sfi;
         this.lastTime = 0;
     }
     syncLrc(nowTime) {
@@ -346,6 +356,7 @@ class LrcProvider {
             ts = this.lyric[i]['start'];
             if (this.lastTime <= ts && nowTime >= ts) {
                 this.nowinfo.info.lyric = this.lyric[i]['text'];
+                this.sfi.lyric = this.lyric[i]['text'];
                 break;
             }
         }
@@ -354,6 +365,7 @@ class LrcProvider {
                 ts = this.tlyric[i]['start'];
                 if (this.lastTime <= ts && nowTime >= ts) {
                     this.nowinfo.info.tlyric = this.tlyric[i]['text'];
+                    this.sfi.tlyric = this.tlyric[i]['text'];
                     break;
                 }
             }
@@ -424,30 +436,50 @@ class LrcProvider {
 }
 
 
-
+class SyncFileInfo {
+    constructor(titleElement) {
+        this.titleElement = titleElement;
+        this.fs = require('fs');
+    }
+    set title(value) {
+        if (value.length > 0) {
+            $(this.titleElement).html(value);
+            this.fs.writeFile(CONFIG.titleFile, CONFIG.titlePrefix + value);
+        } else {
+            $(this.titleElement).html(CONFIG.name);
+            this.fs.writeFile(CONFIG.titleFile, "Stopped");
+        }
+    }
+    set lyric(value) {
+        this.fs.writeFile(CONFIG.lyricFile, value);
+    }
+    set tlyric(value) {
+        this.fs.writeFile(CONFIG.tlyricFile, value);
+    }
+}
 
 class CloudMusicApi {
     constructor() {
         this.j = request.jar();
         var cookie = request.cookie("appver=1.5.2");
-        this.j.setCookie(cookie, "http://music.163.com/", function () { });
+        this.j.setCookie(cookie, "http://music.163.com/", function() { });
     }
     sendRequest(req) {
-        return new Promise(function (resolve, rej) {
+        return new Promise(function(resolve, rej) {
             var resStream = request(req);
             var resBuffer;
-            resStream.on("data", function (chunk) {
+            resStream.on("data", function(chunk) {
                 if (resBuffer == undefined) {
                     resBuffer = chunk;
                 } else {
                     resBuffer = Buffer.concat([resBuffer, chunk]);
                 }
             });
-            resStream.on("end", function () {
+            resStream.on("end", function() {
                 var headers = resStream.response.headers;
                 if (headers['content-encoding'] != undefined && headers['content-encoding'].indexOf('gzip') != -1) {
                     //解压缩gzip
-                    zlib.gunzip(resBuffer, function (err, plain) {
+                    zlib.gunzip(resBuffer, function(err, plain) {
                         resolve(plain.toString());
                     });
                 } else {
