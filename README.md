@@ -34,9 +34,10 @@ https://zyzsdy.com/bili-danmu-vod
 
     npm install -g nw
     
-本项目依赖node.js组件“request”
+本项目依赖node.js组件“request”和“crypto”
 
     npm install request
+    npm install crypto
     
 由于授权协议原因，所以nw.js和本项目中都没有包含可用的MP3解码器。
 

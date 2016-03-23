@@ -21,8 +21,21 @@ class Song {
             /* 歌曲信息处理部分 */
             var songInfo = JSON.parse(detail).songs[0];
             self.title = songInfo.name;
-            self.src = songInfo.mp3Url;
-            self.duration = songInfo.duration;
+
+            if (songInfo.hMusic != null && CONFIG.highRate) {
+                self.src = CloudMusicApi.getTrueUrl(songInfo.hMusic);
+                self.duration = songInfo.hMusic.playTime;
+            } else if (songInfo.mp3Url != null) {
+                self.src = songInfo.mp3Url;
+                self.duration = songInfo.duration;
+            } else if (songInfo.audition != null){
+                self.src = CloudMusicApi.getTrueUrl(songInfo.audition);
+                self.duration = songInfo.audition.playTime;
+            } else {
+                self.src = null;
+                self.duration = 0;
+            }
+            
             var artistArr = [];
             for (var artistIndex in songInfo.artists) {
                 artistArr.push(songInfo.artists[artistIndex].name);
@@ -444,17 +457,17 @@ class SyncFileInfo {
     set title(value) {
         if (value.length > 0) {
             $(this.titleElement).html(value);
-            this.fs.writeFile(CONFIG.titleFile, CONFIG.titlePrefix + value);
+            if (CONFIG.infoOutputFile) this.fs.writeFileSync(CONFIG.titleFile, CONFIG.titlePrefix + value);
         } else {
             $(this.titleElement).html(CONFIG.name);
-            this.fs.writeFile(CONFIG.titleFile, "Stopped");
+            if (CONFIG.infoOutputFile) this.fs.writeFileSync(CONFIG.titleFile, "Stopped");
         }
     }
     set lyric(value) {
-        this.fs.writeFile(CONFIG.lyricFile, value);
+        if (CONFIG.infoOutputFile) this.fs.writeFileSync(CONFIG.lyricFile, value);
     }
     set tlyric(value) {
-        this.fs.writeFile(CONFIG.tlyricFile, value);
+        if (CONFIG.infoOutputFile) this.fs.writeFileSync(CONFIG.tlyricFile, value);
     }
 }
 
@@ -543,6 +556,25 @@ class CloudMusicApi {
         }
 
         return this.sendRequest(req);
+    }
+    //解析真实地址
+    static getTrueUrl(musicNode) {
+        var id = musicNode.dfsId;
+        var ext = musicNode.extension;
+
+        //加密id(反编译自网易云音乐Android客户端)
+        var buffer1 = new Buffer("3go8&$8*3*3h0k(2)2");
+        var buffer2 = new Buffer(String(id));
+        for (var i = 0; i < buffer2.length; i++) {
+            buffer2[i] = buffer2[i] ^ buffer1[i % buffer1.length];
+        }
+
+        var crypto = require('crypto');
+        var result = crypto.createHash('md5').update(buffer2).digest('base64');
+        result = result.replace(/\+/g, '-');
+        result = result.replace(/\//g, "_");
+
+        return "http://m2.music.126.net/" + result + "/" + id + "." + ext;
     }
 }
 CloudMusicApi.header = {

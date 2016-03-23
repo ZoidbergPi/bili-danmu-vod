@@ -28,6 +28,9 @@ var CONFIG = {
     //标题栏左上角出现的内容
     name: "谜之弹幕点歌姬",
     
+    //高音质优先（网速条件不好建议不要开启，true -- 开启， false -- 关闭）
+    highRate: true,
+    
     //支持同一人最多同时点的歌曲数目
     maxCountForone: 3,
     
@@ -39,6 +42,9 @@ var CONFIG = {
     
     //空闲时播放的网易云歌单编号
     freelistId: 144580007,
+    
+    //输出歌词和标题信息到文件(true -- 打开， false -- 关闭)
+    infoOutputFile: true,
     
     //当前歌词输出文件路径（请保证文件存在并可写，如果歌词不存在则全程为空）
     lyricFile: "lyric.txt",

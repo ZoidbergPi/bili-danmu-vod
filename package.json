@@ -1,7 +1,7 @@
 {
   "main": "index.html",
   "name": "bili-danmu-vod",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "window": {
     "icon": "img/icon.png",
     "toolbar": false,
@@ -10,6 +10,7 @@
     "frame": false
   },
   "dependencies": {
+    "crypto": "0.0.3",
     "request": "^2.69.0"
   }
 }
